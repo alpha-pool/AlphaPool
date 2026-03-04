@@ -145,9 +145,6 @@ export default function Home() {
                 <p className="text-muted-foreground mb-4">
                   Browse games and pick teams to track their spread coverage
                 </p>
-                <Tabs defaultValue="browse">
-                  <TabsTrigger value="browse">Browse Games</TabsTrigger>
-                </Tabs>
               </div>
             ) : (
               <div className="space-y-8">
