@@ -2,9 +2,11 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, MapPin, Plus, Check } from 'lucide-react';
+import { Clock, Plus, Check, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
   const spread = game.spread || 0;
