@@ -60,7 +60,7 @@ export default function SpreadIndicator({ game, pickedTeam }) {
           {isCovering ? 'COVERING' : isPush ? 'PUSH' : 'NOT COVERING'}
         </span>
         <span className="text-xs opacity-80">
-          {isCovering ? '+' : '-'}{absMargin} pts {game.status === 'final' ? '(Final)' : ''}
+          {isPush ? 'PUSH' : `${coverMargin > 0 ? '+' : ''}${coverMargin.toFixed(1)} pts vs. spread`}{game.status === 'final' ? ' (Final)' : ''}
         </span>
       </div>
     </div>
