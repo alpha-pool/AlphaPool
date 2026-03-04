@@ -17,6 +17,7 @@ export default function GameDetail() {
   const { data: games = [], isLoading } = useQuery({
     queryKey: ['games'],
     queryFn: () => base44.entities.Game.list(),
+    refetchInterval: (data) => data?.some(g => g.status === 'live') ? 15000 : false,
   });
 
   const { data: trackedGames = [] } = useQuery({
