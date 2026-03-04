@@ -88,9 +88,16 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-4 border-b border-border flex items-center justify-between">
         {getStatusBadge()}
-        {game.conference && (
-          <span className="text-xs text-muted-foreground">{game.conference}</span>
-        )}
+        <div className="flex items-center gap-2">
+          {game.conference && (
+            <span className="text-xs text-muted-foreground">{game.conference}</span>
+          )}
+          <Link to={createPageUrl(`GameDetail?id=${game.id}`)}>
+            <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-primary">
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="p-2 space-y-1">
         <TeamRow
