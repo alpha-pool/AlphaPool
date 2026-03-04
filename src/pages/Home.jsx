@@ -89,7 +89,7 @@ export default function Home() {
                 <Trophy className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">SpreadTracker</h1>
+                <h1 className="text-xl font-bold">AlphaSpread</h1>
                 <p className="text-xs text-muted-foreground">College Football</p>
               </div>
             </div>
