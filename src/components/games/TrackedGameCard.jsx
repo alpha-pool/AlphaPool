@@ -64,17 +64,17 @@ export default function TrackedGameCard({ game, trackedGame, onRemove }) {
         </Button>
       </div>
       
-      <div className="p-4 space-y-4">
+      <div className="p-3 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">Your Pick</p>
-            <p className="text-xl font-bold text-primary">{pickedTeamName} ({spreadDisplay})</p>
-            <p className="text-sm text-muted-foreground">vs {opponentName}</p>
+            <p className="text-xs text-muted-foreground">Your Pick</p>
+            <p className="text-base font-bold text-primary">{pickedTeamName} ({spreadDisplay})</p>
+            <p className="text-xs text-muted-foreground">vs {opponentName}</p>
           </div>
           {game.status !== 'scheduled' && (
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Score</p>
-              <p className="text-2xl font-bold tabular-nums">
+              <p className="text-xs text-muted-foreground">Score</p>
+              <p className="text-xl font-bold tabular-nums">
                 {pickedTeam === 'home' ? game.home_score : game.away_score} - {pickedTeam === 'home' ? game.away_score : game.home_score}
               </p>
             </div>
