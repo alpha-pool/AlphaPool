@@ -115,7 +115,6 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
           spreadTeam={game.spread_team}
         />
       </div>
-      <SportsbookOdds game={game} />
     </Card>
   );
 }
