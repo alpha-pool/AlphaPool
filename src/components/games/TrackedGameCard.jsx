@@ -45,7 +45,7 @@ export default function TrackedGameCard({ game, trackedGame, onRemove }) {
       "overflow-hidden transition-all",
       game.status === 'live' && "ring-2 ring-primary shadow-lg shadow-primary/20"
     )}>
-      <div className="p-4 border-b border-border flex items-center justify-between">
+      <div className="p-2 px-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
           {getStatusBadge()}
           {game.status === 'live' && (
