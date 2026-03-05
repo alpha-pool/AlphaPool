@@ -14,6 +14,9 @@ import TrackedGameCard from '@/components/games/TrackedGameCard';
 export default function Home() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [conferenceFilter, setConferenceFilter] = useState('all');
+
+  const POWER4 = ['SEC', 'Big Ten', 'Big 12', 'ACC'];
   const queryClient = useQueryClient();
   
   const { data: games = [], isLoading: gamesLoading } = useQuery({
