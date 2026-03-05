@@ -17,7 +17,7 @@ export default function Home() {
   const { data: games = [], isLoading: gamesLoading } = useQuery({
     queryKey: ['games'],
     queryFn: () => base44.entities.Game.list('-game_time'),
-    refetchInterval: (data) => data?.some(g => g.status === 'live') ? 15000 : false,
+    refetchInterval: (query) => query.state.data?.some(g => g.status === 'live') ? 15000 : false,
   });
   
   const { data: trackedGames = [], isLoading: trackedLoading } = useQuery({
