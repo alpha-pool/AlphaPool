@@ -99,26 +99,26 @@ export default function Home() {
             
             {/* Quick Stats */}
             <div className="flex items-center gap-4">
-            <Link to={createPageUrl('Community')}>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Users className="w-4 h-4" />
-                <span className="hidden sm:inline">Community</span>
-              </Button>
-            </Link>
-            <div className="hidden md:flex items-center gap-6">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">{trackedGames.length}</p>
-                <p className="text-xs text-muted-foreground">Tracking</p>
+              <Link to={createPageUrl('Community')}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Users className="w-4 h-4" />
+                  <span className="hidden sm:inline">Community</span>
+                </Button>
+              </Link>
+              <div className="hidden md:flex items-center gap-6">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-primary">{trackedGames.length}</p>
+                  <p className="text-xs text-muted-foreground">Tracking</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-accent">{liveTracked.length}</p>
+                  <p className="text-xs text-muted-foreground">Live</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-500">{coveringCount}/{activeGames}</p>
+                  <p className="text-xs text-muted-foreground">Covering</p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-accent">{liveTracked.length}</p>
-                <p className="text-xs text-muted-foreground">Live</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-green-500">{coveringCount}/{activeGames}</p>
-                <p className="text-xs text-muted-foreground">Covering</p>
-              </div>
-            </div>
             </div>
           </div>
         </div>
