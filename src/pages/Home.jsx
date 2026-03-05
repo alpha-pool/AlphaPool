@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import GameCard from '@/components/games/GameCard';
 import TrackedGameCard from '@/components/games/TrackedGameCard';
+import { createPageUrl } from '@/utils';
 
 export default function Home() {
   const [search, setSearch] = useState('');
