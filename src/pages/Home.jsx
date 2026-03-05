@@ -98,6 +98,13 @@ export default function Home() {
             </div>
             
             {/* Quick Stats */}
+            <div className="flex items-center gap-4">
+            <Link to={createPageUrl('Community')}>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Users className="w-4 h-4" />
+                <span className="hidden sm:inline">Community</span>
+              </Button>
+            </Link>
             <div className="hidden md:flex items-center gap-6">
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">{trackedGames.length}</p>
