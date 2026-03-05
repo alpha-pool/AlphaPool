@@ -49,12 +49,22 @@ export default function Home() {
   
   const trackedGameIds = trackedGames.map(tg => tg.game_id);
   
+  const conferences = useMemo(() => {
+    const seen = new Set();
+    games.forEach(g => { if (g.conference) seen.add(g.conference); });
+    return Array.from(seen).sort();
+  }, [games]);
+
   const filteredGames = games.filter(game => {
     const matchesSearch = 
       game.home_team?.toLowerCase().includes(search.toLowerCase()) ||
       game.away_team?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || game.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesConference = 
+      conferenceFilter === 'all' ? true :
+      conferenceFilter === 'power4' ? POWER4.includes(game.conference) :
+      game.conference === conferenceFilter;
+    return matchesSearch && matchesStatus && matchesConference;
   });
   
   const trackedGamesWithDetails = trackedGames.map(tg => ({
