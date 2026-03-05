@@ -119,6 +119,7 @@ export default function Home() {
                 <p className="text-xs text-muted-foreground">Covering</p>
               </div>
             </div>
+            </div>
           </div>
         </div>
       </header>
