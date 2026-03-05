@@ -39,41 +39,41 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
     
     return (
       <div className={cn(
-        "flex items-center justify-between py-3 px-4 rounded-lg transition-colors",
+        "flex items-center justify-between py-2 px-3 rounded-lg transition-colors",
         isPickedTeam && "bg-primary/10 border border-primary/30"
       )}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {logo ? (
-            <img src={logo} alt={teamName} className="w-10 h-10 object-contain" />
+            <img src={logo} alt={teamName} className="w-7 h-7 object-contain" />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-              <span className="text-lg font-bold">{teamName?.charAt(0)}</span>
+            <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center">
+              <span className="text-sm font-bold">{teamName?.charAt(0)}</span>
             </div>
           )}
           <div>
             <p className={cn(
-              "font-semibold",
+              "font-semibold text-sm",
               isPickedTeam && "text-primary"
             )}>
               {teamName}
-              {isPickedTeam && <Check className="w-4 h-4 inline ml-2" />}
+              {isPickedTeam && <Check className="w-3 h-3 inline ml-1" />}
             </p>
             {showSpread && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {spreadDisplay}
               </span>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {game.status !== 'scheduled' && (
-            <span className="text-2xl font-bold tabular-nums">{score}</span>
+            <span className="text-lg font-bold tabular-nums">{score}</span>
           )}
           {!isTracked && game.status !== 'final' && (
             <Button
               size="sm"
               variant="ghost"
-              className="text-primary hover:bg-primary/10"
+              className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
               onClick={() => onTrack(game, isHome ? 'home' : 'away')}
             >
               <Plus className="w-4 h-4" />
