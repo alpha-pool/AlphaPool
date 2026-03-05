@@ -86,7 +86,7 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
   
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="p-4 border-b border-border flex items-center justify-between">
+      <div className="p-2 px-3 border-b border-border flex items-center justify-between">
         {getStatusBadge()}
         <div className="flex items-center gap-2">
           {game.conference && (
