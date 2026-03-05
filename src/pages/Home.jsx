@@ -249,6 +249,18 @@ export default function Home() {
                   <SelectItem value="final">Final</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={conferenceFilter} onValueChange={setConferenceFilter}>
+                <SelectTrigger className="w-full sm:w-44">
+                  <SelectValue placeholder="Conference" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Conferences</SelectItem>
+                  <SelectItem value="power4">Power 4</SelectItem>
+                  {conferences.map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             {gamesLoading ? (
