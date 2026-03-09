@@ -223,7 +223,7 @@ export default function Community() {
           </Link>
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            <h1 className="font-bold text-lg">Leaderboard</h1>
+            <h1 className="font-bold text-lg">CFB Alpha Pool</h1>
           </div>
         </div>
       </header>
