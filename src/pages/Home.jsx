@@ -133,6 +133,12 @@ export default function Home() {
                   <span className="hidden sm:inline">Group</span>
                 </Button>
               </Link>
+              <Link to={createPageUrl('Profile')}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Trophy className="w-4 h-4" />
+                  <span className="hidden sm:inline">My Profile</span>
+                </Button>
+              </Link>
               <div className="hidden md:flex items-center gap-6">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-primary">{trackedGames.length}</p>
