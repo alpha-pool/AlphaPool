@@ -93,6 +93,21 @@ export default function Home() {
   }).length;
   
   const activeGames = trackedGamesWithDetails.filter(tg => tg.game.status !== 'scheduled').length;
+
+  const totalAlpha = trackedGamesWithDetails.reduce((sum, tg) => {
+    const g = tg.game;
+    if (g.status === 'scheduled') return sum;
+    const homeScore = g.home_score || 0;
+    const awayScore = g.away_score || 0;
+    const spread = g.spread || 0;
+    let margin;
+    if (tg.picked_team === 'home') {
+      margin = g.spread_team === 'home' ? (homeScore - awayScore) + spread : (homeScore - awayScore) - spread;
+    } else {
+      margin = g.spread_team === 'away' ? (awayScore - homeScore) + spread : (awayScore - homeScore) - spread;
+    }
+    return sum + margin;
+  }, 0);
   
   return (
     <div className="min-h-screen bg-background">
