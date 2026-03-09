@@ -45,26 +45,37 @@ function CoverBadge({ game, pickedTeam }) {
   );
 }
 
-function UserPicksCard({ name, picks }) {
+function LeaderboardCard({ entry, rank, picks }) {
   const [open, setOpen] = useState(false);
 
   return (
     <Card>
       <CardContent className="p-0">
         <button
-          className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+          className="w-full flex items-center gap-4 px-4 py-3 hover:bg-muted/50 transition-colors"
           onClick={() => setOpen(o => !o)}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-bold text-sm flex-shrink-0">
-              {name.charAt(0).toUpperCase()}
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-sm">{name}</p>
-              <p className="text-xs text-muted-foreground">{picks.length} pick{picks.length !== 1 ? 's' : ''}</p>
-            </div>
+          <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0
+            ${rank === 0 ? 'bg-accent text-accent-foreground' : rank === 1 ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'}`}>
+            {rank + 1}
           </div>
-          {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+          <div className="flex-1 min-w-0 text-left">
+            <p className="font-semibold truncate">{entry.name}</p>
+            <p className="text-xs text-muted-foreground">{entry.total} pick{entry.total !== 1 ? 's' : ''} total</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-lg font-bold text-primary">{entry.covering}/{entry.active}</p>
+              <p className="text-xs text-muted-foreground">covering</p>
+            </div>
+            <div className="text-right">
+              <p className={`text-lg font-bold ${entry.totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                {entry.totalAlpha >= 0 ? '+' : ''}{entry.totalAlpha.toFixed(1)}
+              </p>
+              <p className="text-xs text-muted-foreground">alpha</p>
+            </div>
+            {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+          </div>
         </button>
 
         {open && (
@@ -77,7 +88,6 @@ function UserPicksCard({ name, picks }) {
               const spreadDisplay = g.spread_team === tg.picked_team
                 ? (spread > 0 ? `+${spread}` : `${spread}`)
                 : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
-
               return (
                 <div key={tg.id} className="flex items-center justify-between px-4 py-2.5 gap-3">
                   <div className="flex-1 min-w-0">
