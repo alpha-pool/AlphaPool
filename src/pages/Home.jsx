@@ -21,7 +21,9 @@ export default function Home() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
+    base44.auth.me().then(setCurrentUser).catch(() => {
+      base44.auth.redirectToLogin();
+    });
   }, []);
   
   const { data: games = [], isLoading: gamesLoading } = useQuery({
