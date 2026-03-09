@@ -57,6 +57,7 @@ function CoverBadge({ game, pickedTeam }) {
 export default function Profile() {
   const urlParams = new URLSearchParams(window.location.search);
   const profileEmail = urlParams.get('email');
+  const fromCommunity = urlParams.get('from') === 'community';
 
   const [currentUser, setCurrentUser] = useState(null);
   const [editingBio, setEditingBio] = useState(false);
