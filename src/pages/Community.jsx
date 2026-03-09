@@ -249,6 +249,10 @@ export default function Community() {
               <MessageSquare className="w-4 h-4" />
               Group Chat
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="gap-2">
+              <BarChart2 className="w-4 h-4" />
+              Analytics
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="leaderboard">
