@@ -135,7 +135,7 @@ export default function Home() {
               </Link>
               <Link to={createPageUrl('Profile')}>
                 <Button variant="outline" size="sm" className="gap-2">
-                  <Trophy className="w-4 h-4" />
+                  <UserCircle className="w-4 h-4" />
                   <span className="hidden sm:inline">My Profile</span>
                 </Button>
               </Link>
