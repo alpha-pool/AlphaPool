@@ -130,7 +130,7 @@ export default function Home() {
               <Link to={createPageUrl('Community')}>
                 <Button variant="outline" size="sm" className="gap-2">
                   <Users className="w-4 h-4" />
-                  <span className="hidden sm:inline">Community</span>
+                  <span className="hidden sm:inline">Group</span>
                 </Button>
               </Link>
               <div className="hidden md:flex items-center gap-6">
