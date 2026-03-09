@@ -211,6 +211,11 @@ export default function Community() {
     });
   }, [byUser, gamesById, usersById]);
 
+  const filteredLeaderboard = useMemo(() => {
+    if (!leaderboardSearch.trim()) return leaderboard;
+    return leaderboard.filter(e => e.name.toLowerCase().includes(leaderboardSearch.toLowerCase()));
+  }, [leaderboard, leaderboardSearch]);
+
   // Picks with game detail per user (for dropdown)
   const picksByEmail = useMemo(() => {
     const map = {};
