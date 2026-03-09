@@ -227,10 +227,6 @@ export default function Community() {
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-2">
-              <Trophy className="w-5 h-5 text-primary" />
-              <h2 className="font-bold text-lg">Leaderboard</h2>
-            </div>
             {leaderboard.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
             ) : leaderboard.map((entry, i) => (
