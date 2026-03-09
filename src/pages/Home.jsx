@@ -15,9 +15,14 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [conferenceFilter, setConferenceFilter] = useState('all');
+  const [currentUser, setCurrentUser] = useState(null);
 
   const POWER4 = ['SEC', 'Big Ten', 'Big 12', 'ACC'];
   const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
   
   const { data: games = [], isLoading: gamesLoading } = useQuery({
     queryKey: ['games'],
