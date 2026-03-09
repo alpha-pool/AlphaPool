@@ -215,7 +215,7 @@ export default function Community() {
           </Link>
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-primary" />
-            <h1 className="font-bold text-lg">Community</h1>
+            <h1 className="font-bold text-lg">Group Standings</h1>
           </div>
         </div>
       </header>
