@@ -5,11 +5,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Users, ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, ChevronDown, ChevronUp, MessageSquare, UserCircle } from 'lucide-react';
+import { Trophy, Users, ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, ChevronDown, ChevronUp, MessageSquare, UserCircle, BarChart2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
 import GroupChat from '@/components/community/GroupChat';
+import TeamAnalytics from '@/components/community/TeamAnalytics';
 
 function computeCoverMargin(game, pickedTeam) {
   const homeScore = game.home_score || 0;
