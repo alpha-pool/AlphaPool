@@ -205,10 +205,7 @@ export default function Community() {
         covering,
         totalAlpha,
       };
-    }).sort((a, b) => {
-      if (b.active !== a.active) return b.active - a.active;
-      return b.covering - a.covering;
-    });
+    }).sort((a, b) => b.totalAlpha - a.totalAlpha);
   }, [byUser, gamesById, usersById]);
 
   const filteredLeaderboard = useMemo(() => {
