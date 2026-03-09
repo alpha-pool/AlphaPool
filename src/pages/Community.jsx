@@ -226,59 +226,22 @@ export default function Community() {
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : (
-          <Tabs defaultValue="leaderboard" className="space-y-6">
-            <TabsList className="bg-card border border-border">
-              <TabsTrigger value="leaderboard" className="gap-2">
-                <Trophy className="w-4 h-4" />
-                Leaderboard
-              </TabsTrigger>
-              <TabsTrigger value="feed" className="gap-2">
-                <Users className="w-4 h-4" />
-                Group Feed
-              </TabsTrigger>
-            </TabsList>
-
-            {/* LEADERBOARD */}
-            <TabsContent value="leaderboard" className="space-y-3">
-              {leaderboard.length === 0 ? (
-                <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
-              ) : leaderboard.map((entry, i) => (
-                <Card key={entry.email}>
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0
-                      ${i === 0 ? 'bg-accent text-accent-foreground' : i === 1 ? 'bg-secondary text-secondary-foreground' : i === 2 ? 'bg-muted text-muted-foreground' : 'bg-muted text-muted-foreground'}`}>
-                      {i + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold truncate">{entry.name}</p>
-                      <p className="text-xs text-muted-foreground">{entry.total} pick{entry.total !== 1 ? 's' : ''} total</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-primary">{entry.covering}/{entry.active}</p>
-                        <p className="text-xs text-muted-foreground">covering</p>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-lg font-bold ${entry.totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                          {entry.totalAlpha >= 0 ? '+' : ''}{entry.totalAlpha.toFixed(1)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">alpha</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </TabsContent>
-
-            {/* GROUP FEED */}
-            <TabsContent value="feed" className="space-y-3">
-              {feedByUser.length === 0 ? (
-                <div className="text-center py-20 text-muted-foreground">No picks yet.</div>
-              ) : feedByUser.map(({ email, name, picks }) => (
-                <UserPicksCard key={email} name={name} picks={picks} />
-              ))}
-            </TabsContent>
-          </Tabs>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Trophy className="w-5 h-5 text-primary" />
+              <h2 className="font-bold text-lg">Leaderboard</h2>
+            </div>
+            {leaderboard.length === 0 ? (
+              <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
+            ) : leaderboard.map((entry, i) => (
+              <LeaderboardCard
+                key={entry.email}
+                entry={entry}
+                rank={i}
+                picks={picksByEmail[entry.email] || []}
+              />
+            ))}
+          </div>
         )}
       </main>
     </div>
