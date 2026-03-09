@@ -244,9 +244,17 @@ export default function Community() {
                       <p className="font-semibold truncate">{entry.name}</p>
                       <p className="text-xs text-muted-foreground">{entry.total} pick{entry.total !== 1 ? 's' : ''} total</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-primary">{entry.covering}/{entry.active}</p>
-                      <p className="text-xs text-muted-foreground">covering</p>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-primary">{entry.covering}/{entry.active}</p>
+                        <p className="text-xs text-muted-foreground">covering</p>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-lg font-bold ${entry.totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                          {entry.totalAlpha >= 0 ? '+' : ''}{entry.totalAlpha.toFixed(1)}
+                        </p>
+                        <p className="text-xs text-muted-foreground">alpha pts</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
