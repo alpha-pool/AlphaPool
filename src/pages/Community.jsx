@@ -262,13 +262,23 @@ export default function Community() {
               </div>
             ) : (
               <div className="space-y-3">
-                {leaderboard.length === 0 ? (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search by name..."
+                    value={leaderboardSearch}
+                    onChange={e => setLeaderboardSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-border bg-card focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+                {filteredLeaderboard.length === 0 ? (
                   <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
-                ) : leaderboard.map((entry, i) => (
+                ) : filteredLeaderboard.map((entry, i) => (
                   <LeaderboardCard
                     key={entry.email}
                     entry={entry}
-                    rank={i}
+                    rank={leaderboard.indexOf(entry)}
                     picks={picksByEmail[entry.email] || []}
                   />
                 ))}
