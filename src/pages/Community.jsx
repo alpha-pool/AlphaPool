@@ -138,7 +138,9 @@ export default function Community() {
   const [leaderboardSearch, setLeaderboardSearch] = useState('');
 
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {});
+    base44.auth.me().then(setCurrentUser).catch(() => {
+      base44.auth.redirectToLogin();
+    });
   }, []);
 
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
