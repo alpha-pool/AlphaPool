@@ -170,11 +170,11 @@ export default function Community() {
     return map;
   }, [users]);
 
-  // Group tracked games by user email
+  // Group tracked games by user_email (new field) or fallback to created_by
   const byUser = useMemo(() => {
     const map = {};
     allTracked.forEach(tg => {
-      const email = tg.created_by;
+      const email = tg.user_email || tg.created_by;
       if (!map[email]) map[email] = [];
       map[email].push(tg);
     });
