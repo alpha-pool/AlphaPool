@@ -50,12 +50,14 @@
 import Community from './pages/Community';
 import GameDetail from './pages/GameDetail';
 import Home from './pages/Home';
+import Profile from './pages/Profile';
 
 
 export const PAGES = {
     "Community": Community,
     "GameDetail": GameDetail,
     "Home": Home,
+    "Profile": Profile,
 }
 
 export const pagesConfig = {
