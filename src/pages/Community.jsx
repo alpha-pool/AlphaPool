@@ -192,17 +192,17 @@ export default function Community() {
     });
   }, [byUser, gamesById, usersById]);
 
-  // Feed: grouped by user
-  const feedByUser = useMemo(() => {
-    return Object.entries(byUser).map(([email, picks]) => {
-      const user = usersById[email];
-      const picksWithGame = picks
+  // Picks with game detail per user (for dropdown)
+  const picksByEmail = useMemo(() => {
+    const map = {};
+    Object.entries(byUser).forEach(([email, picks]) => {
+      map[email] = picks
         .map(tg => ({ ...tg, game: gamesById[tg.game_id] }))
         .filter(tg => tg.game)
         .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
-      return { email, name: user?.full_name || email, picks: picksWithGame };
-    }).filter(u => u.picks.length > 0);
-  }, [byUser, gamesById, usersById]);
+    });
+    return map;
+  }, [byUser, gamesById]);
 
   return (
     <div className="min-h-screen bg-background">
