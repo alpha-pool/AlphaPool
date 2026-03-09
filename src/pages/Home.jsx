@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Activity, Calendar, TrendingUp, Trophy, Loader2, Users } from 'lucide-react';
+import { Search, Activity, Calendar, TrendingUp, Trophy, Loader2, Users, UserCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import GameCard from '@/components/games/GameCard';
