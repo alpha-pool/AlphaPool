@@ -146,6 +146,12 @@ export default function Home() {
                   <p className="text-2xl font-bold text-green-500">{coveringCount}/{activeGames}</p>
                   <p className="text-xs text-muted-foreground">Covering</p>
                 </div>
+                <div className="text-center">
+                  <p className={`text-2xl font-bold ${totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                    {totalAlpha >= 0 ? '+' : ''}{totalAlpha.toFixed(1)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Alpha Pts</p>
+                </div>
               </div>
             </div>
           </div>
