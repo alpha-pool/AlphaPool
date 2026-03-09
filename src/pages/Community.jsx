@@ -143,7 +143,10 @@ export default function Community() {
 
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
-    queryFn: () => base44.entities.TrackedGame.list(),
+    queryFn: async () => {
+      const res = await base44.functions.invoke('getAllTrackedGames', {});
+      return res.data;
+    },
   });
 
   const { data: games = [], isLoading: gamesLoading } = useQuery({
