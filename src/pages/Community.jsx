@@ -229,24 +229,43 @@ export default function Community() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {leaderboard.length === 0 ? (
-              <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
-            ) : leaderboard.map((entry, i) => (
-              <LeaderboardCard
-                key={entry.email}
-                entry={entry}
-                rank={i}
-                picks={picksByEmail[entry.email] || []}
-              />
-            ))}
-          </div>
-        )}
+        <Tabs defaultValue="leaderboard" className="space-y-4">
+          <TabsList className="bg-card border border-border">
+            <TabsTrigger value="leaderboard" className="gap-2">
+              <Trophy className="w-4 h-4" />
+              Leaderboard
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Group Chat
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="leaderboard">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {leaderboard.length === 0 ? (
+                  <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
+                ) : leaderboard.map((entry, i) => (
+                  <LeaderboardCard
+                    key={entry.email}
+                    entry={entry}
+                    rank={i}
+                    picks={picksByEmail[entry.email] || []}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="chat">
+            <GroupChat currentUser={currentUser} />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
