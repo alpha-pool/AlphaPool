@@ -112,13 +112,17 @@ export default function Community() {
     });
   }, [byUser, gamesById, usersById]);
 
-  // Feed: all picks sorted by most recent
-  const feed = useMemo(() => {
-    return [...allTracked]
-      .map(tg => ({ ...tg, game: gamesById[tg.game_id] }))
-      .filter(tg => tg.game)
-      .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
-  }, [allTracked, gamesById]);
+  // Feed: grouped by user
+  const feedByUser = useMemo(() => {
+    return Object.entries(byUser).map(([email, picks]) => {
+      const user = usersById[email];
+      const picksWithGame = picks
+        .map(tg => ({ ...tg, game: gamesById[tg.game_id] }))
+        .filter(tg => tg.game)
+        .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      return { email, name: user?.full_name || email, picks: picksWithGame };
+    }).filter(u => u.picks.length > 0);
+  }, [byUser, gamesById, usersById]);
 
   return (
     <div className="min-h-screen bg-background">
