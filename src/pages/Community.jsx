@@ -240,17 +240,17 @@ export default function Community() {
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         <Tabs defaultValue="leaderboard" className="space-y-4">
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="leaderboard" className="gap-2">
-              <Trophy className="w-4 h-4" />
+          <TabsList className="bg-card border border-border h-8">
+            <TabsTrigger value="leaderboard" className="gap-1.5 text-xs px-3 py-1">
+              <Trophy className="w-3 h-3" />
               Leaderboard
             </TabsTrigger>
-            <TabsTrigger value="chat" className="gap-2">
-              <MessageSquare className="w-4 h-4" />
+            <TabsTrigger value="chat" className="gap-1.5 text-xs px-3 py-1">
+              <MessageSquare className="w-3 h-3" />
               Group Chat
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
-              <BarChart2 className="w-4 h-4" />
+            <TabsTrigger value="analytics" className="gap-1.5 text-xs px-3 py-1">
+              <BarChart2 className="w-3 h-3" />
               Analytics
             </TabsTrigger>
           </TabsList>
