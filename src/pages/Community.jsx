@@ -253,7 +253,7 @@ export default function Community() {
                         <p className={`text-lg font-bold ${entry.totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
                           {entry.totalAlpha >= 0 ? '+' : ''}{entry.totalAlpha.toFixed(1)}
                         </p>
-                        <p className="text-xs text-muted-foreground">alpha pts</p>
+                        <p className="text-xs text-muted-foreground">alpha</p>
                       </div>
                     </div>
                   </CardContent>
