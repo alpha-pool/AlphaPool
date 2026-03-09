@@ -66,7 +66,7 @@ function LeaderboardCard({ entry, rank, picks }) {
             <div className="flex items-center gap-1.5">
               <p className="font-semibold truncate">{entry.name}</p>
               <Link
-                to={createPageUrl(`Profile?email=${encodeURIComponent(entry.email)}`)}
+                to={createPageUrl(`Profile?email=${encodeURIComponent(entry.email)}&from=community`)}
                 className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
                 onClick={e => e.stopPropagation()}
               >
