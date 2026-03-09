@@ -124,6 +124,12 @@ function LeaderboardCard({ entry, rank, picks }) {
 }
 
 export default function Community() {
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
+
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
     queryFn: () => base44.entities.TrackedGame.list(),
