@@ -144,7 +144,7 @@ export default function Profile() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to={createPageUrl('Community')}>
+          <Link to={createPageUrl('Home')}>
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-5 h-5" />
             </Button>
