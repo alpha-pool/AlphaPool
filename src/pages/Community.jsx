@@ -62,7 +62,16 @@ function LeaderboardCard({ entry, rank, picks }) {
             {rank + 1}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="font-semibold truncate">{entry.name}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="font-semibold truncate">{entry.name}</p>
+              <Link
+                to={createPageUrl(`Profile?email=${encodeURIComponent(entry.email)}`)}
+                className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
+                onClick={e => e.stopPropagation()}
+              >
+                <UserCircle className="w-4 h-4" />
+              </Link>
+            </div>
             <p className="text-xs text-muted-foreground">{entry.total} pick{entry.total !== 1 ? 's' : ''} total</p>
           </div>
           <div className="flex items-center gap-4">
