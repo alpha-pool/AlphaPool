@@ -199,7 +199,7 @@ export default function Community() {
       }, 0);
       return {
         email,
-        name: user?.full_name || email.split('@')[0].split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        name: user?.full_name || picks[0]?.user_name || email.split('@')[0].split('.').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
         total: picks.length,
         active: active.length,
         covering,
