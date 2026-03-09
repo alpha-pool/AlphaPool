@@ -69,7 +69,9 @@ export default function Profile() {
   useEffect(() => {
     base44.auth.me().then(u => {
       setCurrentUser(u);
-    }).catch(() => {});
+    }).catch(() => {
+      base44.auth.redirectToLogin();
+    });
   }, []);
 
   const targetEmail = profileEmail || currentUser?.email;
