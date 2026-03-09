@@ -135,6 +135,7 @@ function LeaderboardCard({ entry, rank, picks }) {
 
 export default function Community() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [leaderboardSearch, setLeaderboardSearch] = useState('');
 
   useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => {});
