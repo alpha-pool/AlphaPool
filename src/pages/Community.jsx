@@ -165,12 +165,17 @@ export default function Community() {
         const g = gamesById[tg.game_id];
         return g && computeCoverMargin(g, tg.picked_team) > 0;
       }).length;
+      const totalAlpha = active.reduce((sum, tg) => {
+        const g = gamesById[tg.game_id];
+        return g ? sum + computeCoverMargin(g, tg.picked_team) : sum;
+      }, 0);
       return {
         email,
         name: user?.full_name || email,
         total: picks.length,
         active: active.length,
         covering,
+        totalAlpha,
       };
     }).sort((a, b) => {
       if (b.active !== a.active) return b.active - a.active;
