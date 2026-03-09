@@ -49,6 +49,8 @@ export default function Home() {
     trackMutation.mutate({
       game_id: game.id,
       picked_team: team,
+      user_email: currentUser?.email || '',
+      user_name: currentUser?.full_name || '',
     });
   };
   
