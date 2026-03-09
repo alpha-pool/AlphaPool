@@ -184,53 +184,11 @@ export default function Community() {
 
             {/* GROUP FEED */}
             <TabsContent value="feed" className="space-y-3">
-              {feed.length === 0 ? (
+              {feedByUser.length === 0 ? (
                 <div className="text-center py-20 text-muted-foreground">No picks yet.</div>
-              ) : feed.map(tg => {
-                const g = tg.game;
-                const user = usersById[tg.created_by];
-                const pickedTeamName = tg.picked_team === 'home' ? g.home_team : g.away_team;
-                const opponent = tg.picked_team === 'home' ? g.away_team : g.home_team;
-                const spread = g.spread || 0;
-                const spreadDisplay = g.spread_team === tg.picked_team
-                  ? (spread > 0 ? `+${spread}` : `${spread}`)
-                  : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
-
-                return (
-                  <Card key={tg.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-semibold text-sm">{user?.full_name || tg.created_by}</span>
-                            {g.status === 'live' && (
-                              <Badge className="bg-destructive text-destructive-foreground animate-pulse text-xs px-1.5 py-0">
-                                LIVE
-                              </Badge>
-                            )}
-                            {g.status === 'final' && (
-                              <Badge variant="secondary" className="text-xs px-1.5 py-0">FINAL</Badge>
-                            )}
-                            {g.status === 'scheduled' && (
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {format(new Date(g.game_time), 'MMM d, h:mm a')}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-base font-bold text-primary">
-                            {pickedTeamName} <span className="text-muted-foreground font-normal text-sm">({spreadDisplay})</span>
-                          </p>
-                          <p className="text-sm text-muted-foreground">vs {opponent}</p>
-                        </div>
-                        <div className="flex-shrink-0 mt-1">
-                          <CoverBadge game={g} pickedTeam={tg.picked_team} />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              ) : feedByUser.map(({ email, name, picks }) => (
+                <UserPicksCard key={email} name={name} picks={picks} />
+              ))}
             </TabsContent>
           </Tabs>
         )}
