@@ -178,10 +178,10 @@ export default function Home() {
           
           <TabsContent value="tracked" className="space-y-6">
             {trackedGamesWithDetails.length > 0 && (
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border">
-                <TrendingUp className="w-5 h-5 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Total Alpha</span>
-                <span className={`text-2xl font-bold ml-auto ${totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border">
+                <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground">Total Alpha</span>
+                <span className={`text-lg font-bold ml-auto ${totalAlpha >= 0 ? 'text-primary' : 'text-destructive'}`}>
                   {totalAlpha >= 0 ? '+' : ''}{totalAlpha.toFixed(1)}
                 </span>
               </div>
