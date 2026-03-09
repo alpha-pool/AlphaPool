@@ -31,8 +31,11 @@ export default function Home() {
   });
   
   const { data: trackedGames = [], isLoading: trackedLoading } = useQuery({
-    queryKey: ['trackedGames'],
-    queryFn: () => base44.entities.TrackedGame.list(),
+    queryKey: ['trackedGames', currentUser?.email],
+    queryFn: () => currentUser?.email
+      ? base44.entities.TrackedGame.filter({ user_email: currentUser.email })
+      : [],
+    enabled: !!currentUser,
   });
   
   const trackMutation = useMutation({
