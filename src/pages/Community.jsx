@@ -46,6 +46,72 @@ function CoverBadge({ game, pickedTeam }) {
   );
 }
 
+function UserPicksCard({ name, picks }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Card>
+      <CardContent className="p-0">
+        <button
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+          onClick={() => setOpen(o => !o)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-bold text-sm flex-shrink-0">
+              {name.charAt(0).toUpperCase()}
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-sm">{name}</p>
+              <p className="text-xs text-muted-foreground">{picks.length} pick{picks.length !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+          {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+        </button>
+
+        {open && (
+          <div className="border-t border-border divide-y divide-border">
+            {picks.map(tg => {
+              const g = tg.game;
+              const pickedTeamName = tg.picked_team === 'home' ? g.home_team : g.away_team;
+              const opponent = tg.picked_team === 'home' ? g.away_team : g.home_team;
+              const spread = g.spread || 0;
+              const spreadDisplay = g.spread_team === tg.picked_team
+                ? (spread > 0 ? `+${spread}` : `${spread}`)
+                : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
+
+              return (
+                <div key={tg.id} className="flex items-center justify-between px-4 py-2.5 gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      {g.status === 'live' && (
+                        <Badge className="bg-destructive text-destructive-foreground animate-pulse text-xs px-1.5 py-0">LIVE</Badge>
+                      )}
+                      {g.status === 'final' && (
+                        <Badge variant="secondary" className="text-xs px-1.5 py-0">FINAL</Badge>
+                      )}
+                      {g.status === 'scheduled' && (
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {format(new Date(g.game_time), 'MMM d, h:mm a')}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-semibold text-sm text-primary">
+                      {pickedTeamName} <span className="text-muted-foreground font-normal text-xs">({spreadDisplay})</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground">vs {opponent}</p>
+                  </div>
+                  <CoverBadge game={g} pickedTeam={tg.picked_team} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Community() {
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
