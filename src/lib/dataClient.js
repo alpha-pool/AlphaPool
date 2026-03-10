@@ -24,15 +24,12 @@
  *   dataClient.functions.invoke(name, payload)
  */
 
-const backend = import.meta.env.VITE_BACKEND ?? 'base44';
+import * as supabaseBackend from './backends/supabaseBackend.js';
+import * as base44Backend from './backends/base44Backend.js';
 
-let resolved;
-
-if (backend === 'supabase') {
-  resolved = await import('./backends/supabaseBackend.js');
-} else {
-  resolved = await import('./backends/base44Backend.js');
-}
+const resolved = import.meta.env.VITE_BACKEND === 'supabase'
+  ? supabaseBackend
+  : base44Backend;
 
 export const auth = resolved.auth;
 export const Game = resolved.Game;

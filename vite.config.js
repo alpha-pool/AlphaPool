@@ -5,6 +5,9 @@ import base44 from '@base44/vite-plugin'
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    target: 'esnext',
+  },
   plugins: [
     // Only active when VITE_BASE44_APP_BASE_URL is set (Base44 environment)
     base44({
