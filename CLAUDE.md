@@ -12,7 +12,7 @@ AlphaPool (branded "AlphaSpread") is a college sports spread tracking and commun
 ## Project Structure
 ```
 src/
-├── pages/          # Home, GameDetail, Profile, Community, Login
+├── pages/          # Home, GameDetail, Profile, Community, Login, AcceptInvite
 ├── components/
 │   ├── ui/         # Radix UI wrappers
 │   ├── games/      # GameCard, TrackedGameCard, SpreadIndicator, SportsbookOdds
@@ -61,6 +61,7 @@ conference, tournament_round, region, neutral_site
 ## Auth Flow
 - Unauthenticated users → redirected to `/login`
 - `/login` uses `supabase.auth.signInWithPassword` → on success calls `checkAppState()` then navigates to `/`
+- `/accept-invite` — public route; parses Supabase invite tokens from URL hash, calls `setSession`, lets user set a password to complete account activation
 - `auth.me()` fetches Supabase auth user + merges `users` table profile (graceful if no profile row)
 
 ## Edge Functions
@@ -95,9 +96,56 @@ curl -X POST https://<project-ref>.supabase.co/functions/v1/syncSpreads
 - Spreads should be synced **before games tip off** — live in-game lines will overwrite pre-game spreads
 - Free tier: 500 req/month
 
+## Next Up: March Madness Pool
+
+### Goal
+Support a scoped pool/group for March Madness — users join a named pool, picks lock at tip-off, and the leaderboard + alpha tracking are scoped to pool members.
+
+### New Supabase Tables
+
+**`pools`**
+```
+id, name, created_by (user email), sport, season (e.g. "2026"),
+invite_code (short unique string), created_at
+```
+
+**`pool_members`**
+```
+id, pool_id (fk → pools), user_email, joined_at
+```
+
+Both need public SELECT RLS policies (expression `true`). `pools` and `pool_members` also need INSERT policies for authenticated users.
+
+### Pick Locking
+- Picks are locked per game at `game_time` — enforce on the frontend by disabling the pick button when `new Date() >= new Date(game.game_time)`
+- The `TrackedGame.create()` call should be guarded: check `game.status === 'scheduled'` and `new Date() < new Date(game.game_time)` before submitting
+- Spreads are already locked implicitly — `syncSpreads` runs weekly before games tip off
+
+### New Pages / Routes
+- `/pools` — list pools the current user belongs to; button to create a new pool or join via invite code
+- `/pools/:poolId` — pool detail: scoped leaderboard + alpha tracking for members only
+
+### Pool Leaderboard Logic
+Same as `Community.jsx` leaderboard but:
+1. Fetch `pool_members` for the pool → get member emails
+2. Filter `allTracked` to picks where `user_email` is in member emails
+3. Filter `games` to tournament games only (`tournament_round IS NOT NULL`)
+
+### Invite Flow
+- Pool creator shares a URL: `/pools/join?code=<invite_code>`
+- `/pools/join` page: looks up pool by `invite_code`, inserts a `pool_members` row for current user, redirects to `/pools/:poolId`
+
+### Key Notes
+- Pool membership is additive — a user's picks remain global; pools just scope the view
+- Do NOT move picks into a pool-specific table — keep `tracked_games` flat and filter by member list
+- `invite_code` should be generated as a short random string (e.g. 8 chars) on pool creation
+
+---
+
 ## Known Issues / Gotchas
 - Test users created directly in Supabase Auth dashboard won't have a `users` table row — this is handled gracefully
 - `supabase/functions/` is the deploy source; `functions/` at root is a duplicate kept for reference
+- `tracked_games` requires a public SELECT RLS policy for the Community leaderboard to show all users' picks
 
 ## External APIs
 
