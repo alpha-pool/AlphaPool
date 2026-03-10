@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import * as dataClient from '@/lib/dataClient';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,13 +16,13 @@ export default function GameDetail() {
 
   const { data: games = [], isLoading } = useQuery({
     queryKey: ['games'],
-    queryFn: () => base44.entities.Game.list(),
+    queryFn: () => dataClient.Game.list(),
     refetchInterval: (query) => query.state.data?.some(g => g.status === 'live') ? 15000 : false,
   });
 
   const { data: trackedGames = [] } = useQuery({
     queryKey: ['trackedGames'],
-    queryFn: () => base44.entities.TrackedGame.list(),
+    queryFn: () => dataClient.TrackedGame.list(),
   });
 
   const game = games.find(g => g.id === gameId);
@@ -73,7 +73,7 @@ export default function GameDetail() {
     );
   };
 
-  const TeamDisplay = ({ teamName, logo, score, spreadDisplay, isHome }) => (
+  const TeamDisplay = ({ teamName, logo, score, spreadDisplay, isHome, seed }) => (
     <div className="flex flex-col items-center gap-3 flex-1">
       {logo ? (
         <img src={logo} alt={teamName} className="w-24 h-24 object-contain" />
@@ -83,8 +83,13 @@ export default function GameDetail() {
         </div>
       )}
       <div className="text-center">
+        {seed != null && (
+          <p className="text-xs font-semibold text-muted-foreground mb-0.5">#{seed} seed</p>
+        )}
         <p className="text-lg font-bold">{teamName}</p>
-        <p className="text-sm text-muted-foreground">{isHome ? 'Home' : 'Away'}</p>
+        <p className="text-sm text-muted-foreground">
+          {game.neutral_site ? 'Neutral Site' : isHome ? 'Home' : 'Away'}
+        </p>
       </div>
       <div className="text-center">
         {game.status !== 'scheduled' && (
@@ -116,17 +121,27 @@ export default function GameDetail() {
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
-        {/* Status & Conference */}
+        {/* Status & Context */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           {getStatusBadge()}
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {game.conference && (
+            {game.tournament_round ? (
               <>
-                <MapPin className="w-4 h-4" />
-                <span>{game.conference}</span>
+                <Trophy className="w-4 h-4 text-primary" />
+                <span className="font-medium text-primary">{game.tournament_round}</span>
+                {game.region && <span>· {game.region} Region</span>}
+              </>
+            ) : (
+              <>
+                {game.conference && (
+                  <>
+                    <MapPin className="w-4 h-4" />
+                    <span>{game.conference}</span>
+                  </>
+                )}
+                {game.week && <span>· Week {game.week}</span>}
               </>
             )}
-            {game.week && <span>· Week {game.week}</span>}
           </div>
         </div>
 
@@ -140,6 +155,7 @@ export default function GameDetail() {
                 score={game.away_score}
                 spreadDisplay={awaySpreadDisplay}
                 isHome={false}
+                seed={game.away_seed}
               />
 
               <div className="flex flex-col items-center gap-2 px-4">
@@ -172,6 +188,7 @@ export default function GameDetail() {
                 score={game.home_score}
                 spreadDisplay={homeSpreadDisplay}
                 isHome={true}
+                seed={game.home_seed}
               />
             </div>
           </CardContent>
@@ -242,17 +259,34 @@ export default function GameDetail() {
           <CardContent className="p-6 space-y-3">
             <h2 className="font-semibold text-lg">Game Info</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              {game.conference && (
-                <div>
-                  <p className="text-muted-foreground">Conference</p>
-                  <p className="font-medium">{game.conference}</p>
-                </div>
-              )}
-              {game.week && (
-                <div>
-                  <p className="text-muted-foreground">Week</p>
-                  <p className="font-medium">{game.week}</p>
-                </div>
+              {game.tournament_round ? (
+                <>
+                  <div>
+                    <p className="text-muted-foreground">Round</p>
+                    <p className="font-medium">{game.tournament_round}</p>
+                  </div>
+                  {game.region && (
+                    <div>
+                      <p className="text-muted-foreground">Region</p>
+                      <p className="font-medium">{game.region}</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {game.conference && (
+                    <div>
+                      <p className="text-muted-foreground">Conference</p>
+                      <p className="font-medium">{game.conference}</p>
+                    </div>
+                  )}
+                  {game.week && (
+                    <div>
+                      <p className="text-muted-foreground">Week</p>
+                      <p className="font-medium">{game.week}</p>
+                    </div>
+                  )}
+                </>
               )}
               <div>
                 <p className="text-muted-foreground">Date & Time</p>

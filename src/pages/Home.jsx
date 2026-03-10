@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import * as dataClient from '@/lib/dataClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,42 +11,53 @@ import { createPageUrl } from '@/utils';
 import GameCard from '@/components/games/GameCard';
 import TrackedGameCard from '@/components/games/TrackedGameCard';
 
+const TOURNAMENT_ROUNDS = [
+  'First Four',
+  'Round of 64',
+  'Round of 32',
+  'Sweet 16',
+  'Elite Eight',
+  'Final Four',
+  'Championship',
+];
+
 export default function Home() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [conferenceFilter, setConferenceFilter] = useState('all');
+  const [roundFilter, setRoundFilter] = useState('all');
   const [currentUser, setCurrentUser] = useState(null);
 
   const POWER4 = ['SEC', 'Big Ten', 'Big 12', 'ACC'];
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {
-      base44.auth.redirectToLogin();
+    dataClient.auth.me().then(setCurrentUser).catch(() => {
+      dataClient.auth.redirectToLogin();
     });
   }, []);
   
   const { data: games = [], isLoading: gamesLoading } = useQuery({
     queryKey: ['games'],
-    queryFn: () => base44.entities.Game.list('-game_time'),
+    queryFn: () => dataClient.Game.list('-game_time'),
     refetchInterval: (query) => query.state.data?.some(g => g.status === 'live') ? 15000 : false,
   });
   
   const { data: trackedGames = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['trackedGames', currentUser?.email],
     queryFn: () => currentUser?.email
-      ? base44.entities.TrackedGame.filter({ user_email: currentUser.email })
+      ? dataClient.TrackedGame.filter({ user_email: currentUser.email })
       : [],
     enabled: !!currentUser,
   });
   
   const trackMutation = useMutation({
-    mutationFn: (data) => base44.entities.TrackedGame.create(data),
+    mutationFn: (data) => dataClient.TrackedGame.create(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['trackedGames'] }),
   });
   
   const untrackMutation = useMutation({
-    mutationFn: (id) => base44.entities.TrackedGame.delete(id),
+    mutationFn: (id) => dataClient.TrackedGame.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['trackedGames'] }),
   });
   
@@ -67,16 +78,19 @@ export default function Home() {
     return Array.from(seen).sort();
   }, [games]);
 
+  const isTournament = games.some(g => g.tournament_round);
+
   const filteredGames = games.filter(game => {
-    const matchesSearch = 
+    const matchesSearch =
       game.home_team?.toLowerCase().includes(search.toLowerCase()) ||
       game.away_team?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || game.status === statusFilter;
-    const matchesConference = 
+    const matchesConference =
       conferenceFilter === 'all' ? true :
       conferenceFilter === 'power4' ? POWER4.includes(game.conference) :
       game.conference === conferenceFilter;
-    return matchesSearch && matchesStatus && matchesConference;
+    const matchesRound = roundFilter === 'all' || game.tournament_round === roundFilter;
+    return matchesSearch && matchesStatus && matchesConference && matchesRound;
   });
   
   const trackedGamesWithDetails = trackedGames.map(tg => ({
@@ -133,7 +147,7 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-xl font-bold">AlphaSpread</h1>
-                <p className="text-xs text-muted-foreground">College Football</p>
+                <p className="text-xs text-muted-foreground">College Basketball</p>
               </div>
             </div>
             
@@ -276,8 +290,8 @@ export default function Home() {
           
           <TabsContent value="browse" className="space-y-6">
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
+            <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+              <div className="relative flex-1 min-w-48">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search teams..."
@@ -297,18 +311,32 @@ export default function Home() {
                   <SelectItem value="final">Final</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={conferenceFilter} onValueChange={setConferenceFilter}>
-                <SelectTrigger className="w-full sm:w-44">
-                  <SelectValue placeholder="Conference" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Conferences</SelectItem>
-                  <SelectItem value="power4">Power 4</SelectItem>
-                  {conferences.map(c => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isTournament ? (
+                <Select value={roundFilter} onValueChange={setRoundFilter}>
+                  <SelectTrigger className="w-full sm:w-44">
+                    <SelectValue placeholder="Round" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Rounds</SelectItem>
+                    {TOURNAMENT_ROUNDS.map(r => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Select value={conferenceFilter} onValueChange={setConferenceFilter}>
+                  <SelectTrigger className="w-full sm:w-44">
+                    <SelectValue placeholder="Conference" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Conferences</SelectItem>
+                    <SelectItem value="power4">Power 4</SelectItem>
+                    {conferences.map(c => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             
             {gamesLoading ? (

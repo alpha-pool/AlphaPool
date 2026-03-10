@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import * as dataClient from '@/lib/dataClient';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, Trophy, Target, Flame, Pencil, Check, X } from 'lucide-react';
+import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, Target, Pencil, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
@@ -67,10 +67,10 @@ export default function Profile() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then(u => {
+    dataClient.auth.me().then(u => {
       setCurrentUser(u);
     }).catch(() => {
-      base44.auth.redirectToLogin();
+      dataClient.auth.redirectToLogin();
     });
   }, []);
 
@@ -79,17 +79,17 @@ export default function Profile() {
 
   const { data: users = [] } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => dataClient.User.list(),
   });
 
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
-    queryFn: () => base44.entities.TrackedGame.list(),
+    queryFn: () => dataClient.TrackedGame.list(),
   });
 
   const { data: games = [], isLoading: gamesLoading } = useQuery({
     queryKey: ['games'],
-    queryFn: () => base44.entities.Game.list('-game_time'),
+    queryFn: () => dataClient.Game.list('-game_time'),
   });
 
   const profileUser = useMemo(() => users.find(u => u.email === targetEmail), [users, targetEmail]);
@@ -102,7 +102,7 @@ export default function Profile() {
   }, [profileUser]);
 
   const updateMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
+    mutationFn: (data) => dataClient.auth.updateMe(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setEditingBio(false);
