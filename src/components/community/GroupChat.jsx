@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import * as dataClient from '@/lib/dataClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send } from 'lucide-react';
@@ -13,12 +13,12 @@ export default function GroupChat({ currentUser }) {
 
   const { data: messages = [] } = useQuery({
     queryKey: ['groupMessages'],
-    queryFn: () => base44.entities.GroupMessage.list('created_date'),
+    queryFn: () => dataClient.GroupMessage.list('created_date'),
     refetchInterval: 10000,
   });
 
   const sendMutation = useMutation({
-    mutationFn: (msg) => base44.entities.GroupMessage.create(msg),
+    mutationFn: (msg) => dataClient.GroupMessage.create(msg),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['groupMessages'] }),
   });
 

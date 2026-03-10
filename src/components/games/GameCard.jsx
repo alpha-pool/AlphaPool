@@ -11,7 +11,7 @@ import { createPageUrl } from '@/utils';
 export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
   const spread = game.spread || 0;
   const spreadDisplay = spread > 0 ? `+${spread}` : spread;
-  
+
   const getStatusBadge = () => {
     if (game.status === 'live') {
       return (
@@ -31,16 +31,20 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
       </Badge>
     );
   };
-  
-  const TeamRow = ({ team, logo, score, isHome, spreadTeam }) => {
-    const showSpread = spreadTeam === (isHome ? 'home' : 'away');
+
+  const TeamRow = ({ isHome }) => {
     const teamName = isHome ? game.home_team : game.away_team;
-    const isPickedTeam = isTracked && trackedTeam === (isHome ? 'home' : 'away');
-    
+    const logo = isHome ? game.home_logo : game.away_logo;
+    const score = isHome ? game.home_score : game.away_score;
+    const seed = isHome ? game.home_seed : game.away_seed;
+    const side = isHome ? 'home' : 'away';
+    const showSpread = game.spread_team === side;
+    const isPickedTeam = isTracked && trackedTeam === side;
+
     return (
       <div className={cn(
-        "flex items-center justify-between py-2 px-3 rounded-lg transition-colors",
-        isPickedTeam && "bg-primary/10 border border-primary/30"
+        'flex items-center justify-between py-2 px-3 rounded-lg transition-colors',
+        isPickedTeam && 'bg-primary/10 border border-primary/30'
       )}>
         <div className="flex items-center gap-2">
           {logo ? (
@@ -51,17 +55,15 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
             </div>
           )}
           <div>
-            <p className={cn(
-              "font-semibold text-sm",
-              isPickedTeam && "text-primary"
-            )}>
+            <p className={cn('font-semibold text-sm', isPickedTeam && 'text-primary')}>
+              {seed != null && (
+                <span className="text-muted-foreground font-normal mr-1">({seed})</span>
+              )}
               {teamName}
               {isPickedTeam && <Check className="w-3 h-3 inline ml-1" />}
             </p>
             {showSpread && (
-              <span className="text-xs text-muted-foreground">
-                {spreadDisplay}
-              </span>
+              <span className="text-xs text-muted-foreground">{spreadDisplay}</span>
             )}
           </div>
         </div>
@@ -74,7 +76,7 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
               size="sm"
               variant="ghost"
               className="h-7 w-7 p-0 text-primary hover:bg-primary/10"
-              onClick={() => onTrack(game, isHome ? 'home' : 'away')}
+              onClick={() => onTrack(game, side)}
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -83,14 +85,19 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
       </div>
     );
   };
-  
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="p-2 px-3 border-b border-border flex items-center justify-between">
         {getStatusBadge()}
         <div className="flex items-center gap-2">
-          {game.conference && (
+          {game.tournament_round ? (
+            <span className="text-xs font-medium text-primary">{game.tournament_round}</span>
+          ) : game.conference ? (
             <span className="text-xs text-muted-foreground">{game.conference}</span>
+          ) : null}
+          {game.region && (
+            <span className="text-xs text-muted-foreground">· {game.region}</span>
           )}
           <Link to={createPageUrl(`GameDetail?id=${game.id}`)}>
             <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-primary">
@@ -100,20 +107,8 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
         </div>
       </div>
       <div className="p-2 space-y-1">
-        <TeamRow
-          team={game.away_team}
-          logo={game.away_logo}
-          score={game.away_score}
-          isHome={false}
-          spreadTeam={game.spread_team}
-        />
-        <TeamRow
-          team={game.home_team}
-          logo={game.home_logo}
-          score={game.home_score}
-          isHome={true}
-          spreadTeam={game.spread_team}
-        />
+        <TeamRow isHome={false} />
+        <TeamRow isHome={true} />
       </div>
     </Card>
   );

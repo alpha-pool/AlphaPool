@@ -1,39 +1,83 @@
-**Welcome to your Base44 project** 
+# AlphaSpread
 
-**About**
+A college sports spread tracking and community analytics platform. Users pick teams against the spread, earn alpha points based on cover margin, and compete on a group leaderboard.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## Tech Stack
 
-This project contains everything you need to run your app locally.
+- **Frontend:** React 18 + Vite, React Router 6, TanStack Query 5, Tailwind CSS, Radix UI, Framer Motion, Recharts
+- **Backend:** Supabase (auth + database + edge functions)
+- **Game data:** ESPN API (scores, live updates)
+- **Spread data:** The Odds API
 
-**Edit the code in your local development environment**
+## Local Development
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+**Prerequisites:** Node.js 18+, [Supabase CLI](https://supabase.com/docs/guides/cli)
 
-**Prerequisites:** 
+1. Clone the repo and install dependencies:
+   ```bash
+   npm install
+   ```
 
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
+2. Create a `.env` file:
+   ```env
+   VITE_BACKEND=supabase
+   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<your-anon-key>
+   ```
 
+3. Run the app:
+   ```bash
+   npm run dev
+   ```
+
+4. Visit `http://localhost:5173` — you'll be redirected to `/login`. Sign in with your Supabase auth credentials.
+
+## Edge Functions
+
+Game data and spreads are synced via two Supabase Edge Functions in `supabase/functions/`:
+
+| Function | Source | Purpose |
+|---|---|---|
+| `syncGames` | ESPN API | Upserts today's NCAAB games into the `games` table |
+| `syncSpreads` | The Odds API | Updates `spread` and `spread_team` on non-final games |
+
+### Deploying functions
+
+```bash
+supabase login
+supabase link --project-ref <project-ref>
+supabase functions deploy syncGames --no-verify-jwt
+supabase functions deploy syncSpreads --no-verify-jwt
 ```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
 
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+### Setting secrets
+
+```bash
+supabase secrets set ODDS_API_KEY=your_key_here
+```
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are injected automatically.
+
+### Invoking manually
+
+```bash
+curl -X POST https://<project-ref>.supabase.co/functions/v1/syncGames
+curl -X POST https://<project-ref>.supabase.co/functions/v1/syncSpreads
 ```
 
-Run the app: `npm run dev`
+### Recommended cron schedule
 
-**Publish your changes**
+| Function | Schedule |
+|---|---|
+| `syncGames` | Every 1-5 minutes during game windows |
+| `syncSpreads` | Once weekly (Tuesday morning) |
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+## Supabase Table Permissions
 
-**Docs & Support**
+The following tables need a public `SELECT` policy for the frontend to read data:
 
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
+- `games`
+- `tracked_games`
+- `users`
+- `group_messages`
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+Go to **Supabase → Authentication → Policies → [table] → New Policy** and add a `SELECT` policy with `true` as the expression.

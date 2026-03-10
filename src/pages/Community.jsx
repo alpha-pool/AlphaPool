@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import * as dataClient from '@/lib/dataClient';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -138,27 +138,27 @@ export default function Community() {
   const [leaderboardSearch, setLeaderboardSearch] = useState('');
 
   useEffect(() => {
-    base44.auth.me().then(setCurrentUser).catch(() => {
-      base44.auth.redirectToLogin();
+    dataClient.auth.me().then(setCurrentUser).catch(() => {
+      dataClient.auth.redirectToLogin();
     });
   }, []);
 
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
     queryFn: async () => {
-      const res = await base44.functions.invoke('getAllTrackedGames', {});
+      const res = await dataClient.functions.invoke('getAllTrackedGames', {});
       return res.data;
     },
   });
 
   const { data: games = [], isLoading: gamesLoading } = useQuery({
     queryKey: ['games'],
-    queryFn: () => base44.entities.Game.list('-game_time'),
+    queryFn: () => dataClient.Game.list('-game_time'),
   });
 
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ['users'],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => dataClient.User.list(),
   });
 
   const isLoading = trackedLoading || gamesLoading || usersLoading;
