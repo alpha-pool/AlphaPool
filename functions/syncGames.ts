@@ -106,25 +106,16 @@ Deno.serve(async () => {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const events = await fetchESPNGames();
-    const results = { created: 0, updated: 0, errors: 0 };
+    const results = { upserted: 0, errors: 0 };
 
     for (const event of events) {
       try {
         const gameData = mapGame(event);
-
-        const { data: existing } = await supabase
+        const { error } = await supabase
           .from('games')
-          .select('id')
-          .eq('external_id', gameData.external_id)
-          .single();
-
-        if (existing) {
-          await supabase.from('games').update(gameData).eq('id', existing.id);
-          results.updated++;
-        } else {
-          await supabase.from('games').insert(gameData);
-          results.created++;
-        }
+          .upsert(gameData, { onConflict: 'external_id' });
+        if (error) throw new Error(error.message);
+        results.upserted++;
       } catch (err) {
         console.error(`Error processing event ${event.id}:`, err);
         results.errors++;
