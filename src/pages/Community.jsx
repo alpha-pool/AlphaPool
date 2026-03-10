@@ -145,10 +145,7 @@ export default function Community() {
 
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
-    queryFn: async () => {
-      const res = await dataClient.functions.invoke('getAllTrackedGames', {});
-      return res.data;
-    },
+    queryFn: () => dataClient.TrackedGame.list('-created_date'),
   });
 
   const { data: games = [], isLoading: gamesLoading } = useQuery({
