@@ -116,3 +116,5 @@ export const functions = {
     return data;
   },
 };
+
+export const supabaseClient = supabase;
