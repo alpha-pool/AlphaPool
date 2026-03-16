@@ -14,8 +14,10 @@ export default function TrackedGameCard({ game, trackedGame, onRemove }) {
   const spread = game.spread || 0;
   
   let spreadDisplay;
-  if (game.spread_team === pickedTeam) {
-    spreadDisplay = spread > 0 ? `+${spread}` : spread;
+  if (game.spread == null || game.spread_team == null) {
+    spreadDisplay = 'No line';
+  } else if (game.spread_team === pickedTeam) {
+    spreadDisplay = spread > 0 ? `+${spread}` : `${spread}`;
   } else {
     spreadDisplay = spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`;
   }
@@ -54,14 +56,17 @@ export default function TrackedGameCard({ game, trackedGame, onRemove }) {
             </span>
           )}
         </div>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-8 w-8 text-muted-foreground hover:text-destructive"
-          onClick={() => onRemove(trackedGame.id)}
-        >
-          <X className="w-4 h-4" />
-        </Button>
+        {game.status === 'scheduled' && (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+            title="Remove pick"
+            onClick={() => onRemove(trackedGame.id)}
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        )}
       </div>
       
       <div className="p-2 px-3 space-y-2">

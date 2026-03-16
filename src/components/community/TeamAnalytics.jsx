@@ -1,21 +1,7 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Users } from 'lucide-react';
-
-function computeCoverMargin(game, pickedTeam) {
-  const homeScore = game.home_score || 0;
-  const awayScore = game.away_score || 0;
-  const spread = game.spread || 0;
-  if (pickedTeam === 'home') {
-    return game.spread_team === 'home'
-      ? (homeScore - awayScore) + spread
-      : (homeScore - awayScore) - spread;
-  } else {
-    return game.spread_team === 'away'
-      ? (awayScore - homeScore) + spread
-      : (awayScore - homeScore) - spread;
-  }
-}
+import { computeCoverMargin } from '@/lib/alpha';
 
 function BarRow({ label, value, max, sub, color = 'bg-primary' }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -47,6 +33,7 @@ export default function TeamAnalytics({ allTracked, games }) {
       map[teamName].picks++;
       if (game.status !== 'scheduled') {
         const margin = computeCoverMargin(game, tg.picked_team);
+        if (margin === null) return;
         map[teamName].active++;
         map[teamName].totalMargin += margin;
         if (margin > 0) map[teamName].covered++;

@@ -7,10 +7,10 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { isGamePickable } from '@/lib/alpha';
 
 export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
-  const spread = game.spread || 0;
-  const spreadDisplay = spread > 0 ? `+${spread}` : spread;
+  const pickable = isGamePickable(game);
 
   const getStatusBadge = () => {
     if (game.status === 'live') {
@@ -38,7 +38,10 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
     const score = isHome ? game.home_score : game.away_score;
     const seed = isHome ? game.home_seed : game.away_seed;
     const side = isHome ? 'home' : 'away';
-    const showSpread = game.spread_team === side;
+    const showSpread = game.spread_team === side && game.spread != null;
+    const spreadDisplay = game.spread != null
+      ? (game.spread > 0 ? `+${game.spread}` : `${game.spread}`)
+      : null;
     const isPickedTeam = isTracked && trackedTeam === side;
 
     return (
@@ -62,16 +65,17 @@ export default function GameCard({ game, onTrack, isTracked, trackedTeam }) {
               {teamName}
               {isPickedTeam && <Check className="w-3 h-3 inline ml-1" />}
             </p>
-            {showSpread && (
-              <span className="text-xs text-muted-foreground">{spreadDisplay}</span>
-            )}
+            {showSpread
+              ? <span className="text-xs text-muted-foreground">{spreadDisplay}</span>
+              : !game.spread_team && side === 'home' && <span className="text-xs text-muted-foreground">No line</span>
+            }
           </div>
         </div>
         <div className="flex items-center gap-2">
           {game.status !== 'scheduled' && (
             <span className="text-lg font-bold tabular-nums">{score}</span>
           )}
-          {!isTracked && game.status !== 'final' && (
+          {!isTracked && pickable && (
             <Button
               size="sm"
               variant="ghost"

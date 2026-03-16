@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Activity, Calendar, TrendingUp, Trophy, Loader2, Users, UserCircle } from 'lucide-react';
+import { computeCoverMargin, isGamePickable } from '@/lib/alpha';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import GameCard from '@/components/games/GameCard';
@@ -62,6 +63,7 @@ export default function Home() {
   });
   
   const handleTrack = (game, team) => {
+    if (!isGamePickable(game)) return;
     trackMutation.mutate({
       game_id: game.id,
       picked_team: team,
@@ -104,35 +106,17 @@ export default function Home() {
   
   // Stats
   const coveringCount = trackedGamesWithDetails.filter(tg => {
-    const g = tg.game;
-    if (g.status === 'scheduled') return false;
-    const homeScore = g.home_score || 0;
-    const awayScore = g.away_score || 0;
-    const spread = g.spread || 0;
-    let margin;
-    if (tg.picked_team === 'home') {
-      margin = g.spread_team === 'home' ? (homeScore - awayScore) + spread : (homeScore - awayScore) - spread;
-    } else {
-      margin = g.spread_team === 'away' ? (awayScore - homeScore) + spread : (awayScore - homeScore) - spread;
-    }
-    return margin > 0;
+    if (tg.game.status === 'scheduled') return false;
+    const margin = computeCoverMargin(tg.game, tg.picked_team);
+    return margin !== null && margin > 0;
   }).length;
-  
+
   const activeGames = trackedGamesWithDetails.filter(tg => tg.game.status !== 'scheduled').length;
 
   const totalAlpha = trackedGamesWithDetails.reduce((sum, tg) => {
-    const g = tg.game;
-    if (g.status === 'scheduled') return sum;
-    const homeScore = g.home_score || 0;
-    const awayScore = g.away_score || 0;
-    const spread = g.spread || 0;
-    let margin;
-    if (tg.picked_team === 'home') {
-      margin = g.spread_team === 'home' ? (homeScore - awayScore) + spread : (homeScore - awayScore) - spread;
-    } else {
-      margin = g.spread_team === 'away' ? (awayScore - homeScore) + spread : (awayScore - homeScore) - spread;
-    }
-    return sum + margin;
+    if (tg.game.status === 'scheduled') return sum;
+    const margin = computeCoverMargin(tg.game, tg.picked_team);
+    return sum + (margin ?? 0);
   }, 0);
   
   return (
@@ -157,6 +141,12 @@ export default function Home() {
                 <Button variant="outline" size="sm" className="gap-2">
                   <Users className="w-4 h-4" />
                   <span className="hidden sm:inline">Group</span>
+                </Button>
+              </Link>
+              <Link to="/Pools">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Trophy className="w-4 h-4" />
+                  <span className="hidden sm:inline">My Pool</span>
                 </Button>
               </Link>
               <Link to={createPageUrl('Profile')}>

@@ -36,4 +36,6 @@ export const Game = resolved.Game;
 export const TrackedGame = resolved.TrackedGame;
 export const User = resolved.User;
 export const GroupMessage = resolved.GroupMessage;
+export const Pool = resolved.Pool;
+export const PoolMember = resolved.PoolMember;
 export const functions = resolved.functions;

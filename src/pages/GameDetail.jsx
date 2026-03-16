@@ -47,13 +47,16 @@ export default function GameDetail() {
     );
   }
 
-  const spread = game.spread || 0;
-  const homeSpreadDisplay = game.spread_team === 'home'
-    ? (spread > 0 ? `+${spread}` : `${spread}`)
-    : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
-  const awaySpreadDisplay = game.spread_team === 'away'
-    ? (spread > 0 ? `+${spread}` : `${spread}`)
-    : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
+  const spread = game.spread;
+  const hasSpread = spread != null && game.spread_team != null;
+  const homeSpreadDisplay = !hasSpread ? 'No line'
+    : game.spread_team === 'home'
+      ? (spread > 0 ? `+${spread}` : `${spread}`)
+      : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
+  const awaySpreadDisplay = !hasSpread ? 'No line'
+    : game.spread_team === 'away'
+      ? (spread > 0 ? `+${spread}` : `${spread}`)
+      : (spread > 0 ? `-${spread}` : `+${Math.abs(spread)}`);
 
   const getStatusBadge = () => {
     if (game.status === 'live') {
@@ -213,6 +216,9 @@ export default function GameDetail() {
         <Card>
           <CardContent className="p-6 space-y-4">
             <h2 className="font-semibold text-lg">Spread Info</h2>
+            {!hasSpread ? (
+              <p className="text-sm text-muted-foreground">No line available for this game.</p>
+            ) : (
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-muted rounded-xl p-4 text-center">
                 <p className="text-sm text-muted-foreground mb-1">Favored Team</p>
@@ -251,6 +257,7 @@ export default function GameDetail() {
                 </>
               )}
             </div>
+            )}
           </CardContent>
         </Card>
 

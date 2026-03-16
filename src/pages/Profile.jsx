@@ -10,21 +10,7 @@ import { ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, Target, Pen
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format } from 'date-fns';
-
-function computeCoverMargin(game, pickedTeam) {
-  const homeScore = game.home_score || 0;
-  const awayScore = game.away_score || 0;
-  const spread = game.spread || 0;
-  if (pickedTeam === 'home') {
-    return game.spread_team === 'home'
-      ? (homeScore - awayScore) + spread
-      : (homeScore - awayScore) - spread;
-  } else {
-    return game.spread_team === 'away'
-      ? (awayScore - homeScore) + spread
-      : (awayScore - homeScore) - spread;
-  }
-}
+import { computeCoverMargin } from '@/lib/alpha';
 
 function StatCard({ label, value, sub, color = 'text-foreground' }) {
   return (
@@ -43,6 +29,9 @@ function CoverBadge({ game, pickedTeam }) {
     return <span className="text-xs text-muted-foreground flex items-center gap-1"><Minus className="w-3 h-3" />Pending</span>;
   }
   const margin = computeCoverMargin(game, pickedTeam);
+  if (margin === null) {
+    return <span className="text-xs text-muted-foreground flex items-center gap-1"><Minus className="w-3 h-3" />No line</span>;
+  }
   const covering = margin > 0;
   const push = margin === 0;
   return (
@@ -125,8 +114,14 @@ export default function Profile() {
 
   const stats = useMemo(() => {
     const active = myPicks.filter(tg => tg.game.status !== 'scheduled');
-    const covering = active.filter(tg => computeCoverMargin(tg.game, tg.picked_team) > 0).length;
-    const totalAlpha = active.reduce((sum, tg) => sum + computeCoverMargin(tg.game, tg.picked_team), 0);
+    const covering = active.filter(tg => {
+      const margin = computeCoverMargin(tg.game, tg.picked_team);
+      return margin !== null && margin > 0;
+    }).length;
+    const totalAlpha = active.reduce((sum, tg) => {
+      const margin = computeCoverMargin(tg.game, tg.picked_team);
+      return sum + (margin ?? 0);
+    }, 0);
     const winRate = active.length > 0 ? ((covering / active.length) * 100).toFixed(0) : '—';
     return { total: myPicks.length, active: active.length, covering, totalAlpha, winRate };
   }, [myPicks]);

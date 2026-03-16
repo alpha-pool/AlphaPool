@@ -28,6 +28,8 @@ const TABLE = {
   TrackedGame: 'tracked_games',
   User: 'users',
   GroupMessage: 'group_messages',
+  Pool: 'pools',
+  PoolMember: 'pool_members',
 };
 
 // Maps sort field prefixes: Base44 uses "-field" for descending
@@ -107,6 +109,14 @@ export const Game = makeEntityAdapter('Game');
 export const TrackedGame = makeEntityAdapter('TrackedGame');
 export const User = makeEntityAdapter('User');
 export const GroupMessage = makeEntityAdapter('GroupMessage');
+export const Pool = {
+  ...makeEntityAdapter('Pool'),
+  findByInviteCode: (code) =>
+    supabaseRequest(
+      supabase.from('pools').select('*').eq('invite_code', code).single()
+    ),
+};
+export const PoolMember = makeEntityAdapter('PoolMember');
 
 export const functions = {
   // Supabase Edge Functions are invoked via the supabase client

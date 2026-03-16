@@ -8,6 +8,9 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Login from './pages/Login';
 import AcceptInvite from './pages/AcceptInvite';
+import Pools from './pages/Pools';
+import PoolDetail from './pages/PoolDetail';
+import PoolJoin from './pages/PoolJoin';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -59,6 +62,10 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      {/* Pool routes — /Pools/join must come before /Pools/:poolId */}
+      <Route path="/Pools" element={<Pools />} />
+      <Route path="/Pools/join" element={<PoolJoin />} />
+      <Route path="/Pools/:poolId" element={<PoolDetail />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

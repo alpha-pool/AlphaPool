@@ -5,32 +5,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Users, ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, ChevronDown, ChevronUp, MessageSquare, UserCircle, BarChart2, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { createPageUrl } from '@/utils';
+import { Trophy, ArrowLeft, Loader2, TrendingUp, TrendingDown, Minus, Clock, ChevronDown, ChevronUp, Copy, Check, BarChart2, Share2 } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import GroupChat from '@/components/community/GroupChat';
-import TeamAnalytics from '@/components/community/TeamAnalytics';
 import { computeCoverMargin } from '@/lib/alpha';
 import { buildLeaderboard } from '@/lib/leaderboard';
+import TeamAnalytics from '@/components/community/TeamAnalytics';
 
 function CoverBadge({ game, pickedTeam }) {
   if (game.status === 'scheduled') {
-    return (
-      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-        <Minus className="w-3 h-3" />
-        Pending
-      </span>
-    );
+    return <span className="flex items-center gap-1 text-xs text-muted-foreground"><Minus className="w-3 h-3" />Pending</span>;
   }
   const margin = computeCoverMargin(game, pickedTeam);
   if (margin === null) {
-    return (
-      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-        <Minus className="w-3 h-3" />
-        No line
-      </span>
-    );
+    return <span className="flex items-center gap-1 text-xs text-muted-foreground"><Minus className="w-3 h-3" />No line</span>;
   }
   const covering = margin > 0;
   const push = margin === 0;
@@ -45,7 +33,6 @@ function CoverBadge({ game, pickedTeam }) {
 
 function LeaderboardCard({ entry, rank, picks }) {
   const [open, setOpen] = useState(false);
-
   return (
     <Card>
       <CardContent className="p-0">
@@ -58,17 +45,8 @@ function LeaderboardCard({ entry, rank, picks }) {
             {rank + 1}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <div className="flex items-center gap-1.5">
-              <p className="font-semibold truncate">{entry.name}</p>
-              <Link
-                to={createPageUrl(`Profile?email=${encodeURIComponent(entry.email)}&from=community`)}
-                className="text-muted-foreground hover:text-primary transition-colors flex-shrink-0"
-                onClick={e => e.stopPropagation()}
-              >
-                <UserCircle className="w-4 h-4" />
-              </Link>
-            </div>
-            <p className="text-xs text-muted-foreground">{entry.total} pick{entry.total !== 1 ? 's' : ''} total</p>
+            <p className="font-semibold truncate">{entry.name}</p>
+            <p className="text-xs text-muted-foreground">{entry.total} tournament pick{entry.total !== 1 ? 's' : ''}</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
@@ -100,17 +78,16 @@ function LeaderboardCard({ entry, rank, picks }) {
                 <div key={tg.id} className="flex items-center justify-between px-4 py-2.5 gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      {g.status === 'live' && (
-                        <Badge className="bg-destructive text-destructive-foreground animate-pulse text-xs px-1.5 py-0">LIVE</Badge>
-                      )}
-                      {g.status === 'final' && (
-                        <Badge variant="secondary" className="text-xs px-1.5 py-0">FINAL</Badge>
-                      )}
+                      {g.status === 'live' && <Badge className="bg-destructive text-destructive-foreground animate-pulse text-xs px-1.5 py-0">LIVE</Badge>}
+                      {g.status === 'final' && <Badge variant="secondary" className="text-xs px-1.5 py-0">FINAL</Badge>}
                       {g.status === 'scheduled' && (
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {format(new Date(g.game_time), 'MMM d, h:mm a')}
                         </span>
+                      )}
+                      {g.tournament_round && (
+                        <span className="text-xs font-medium text-primary">{g.tournament_round}</span>
                       )}
                     </div>
                     <p className="font-semibold text-sm text-primary">
@@ -129,15 +106,27 @@ function LeaderboardCard({ entry, rank, picks }) {
   );
 }
 
-export default function Community() {
+export default function PoolDetail() {
+  const { poolId } = useParams();
   const [currentUser, setCurrentUser] = useState(null);
-  const [leaderboardSearch, setLeaderboardSearch] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     dataClient.auth.me().then(setCurrentUser).catch(() => {
       dataClient.auth.redirectToLogin();
     });
   }, []);
+
+  const { data: pools = [], isLoading: poolLoading } = useQuery({
+    queryKey: ['pool', poolId],
+    queryFn: () => dataClient.Pool.filter({ id: poolId }),
+  });
+  const pool = pools[0];
+
+  const { data: memberRows = [], isLoading: membersLoading } = useQuery({
+    queryKey: ['poolMembers', poolId],
+    queryFn: () => dataClient.PoolMember.filter({ pool_id: poolId }),
+  });
 
   const { data: allTracked = [], isLoading: trackedLoading } = useQuery({
     queryKey: ['allTrackedGames'],
@@ -149,12 +138,15 @@ export default function Community() {
     queryFn: () => dataClient.Game.list('-game_time'),
   });
 
-  const { data: users = [], isLoading: usersLoading } = useQuery({
+  const { data: users = [] } = useQuery({
     queryKey: ['users'],
     queryFn: () => dataClient.User.list(),
   });
 
-  const isLoading = trackedLoading || gamesLoading || usersLoading;
+  const isLoading = poolLoading || membersLoading || trackedLoading || gamesLoading;
+
+  const memberEmails = useMemo(() => new Set(memberRows.map(m => m.user_email)), [memberRows]);
+  const isMember = !!(currentUser && memberEmails.has(currentUser.email));
 
   const gamesById = useMemo(() => {
     const map = {};
@@ -168,45 +160,97 @@ export default function Community() {
     return map;
   }, [users]);
 
-  const leaderboard = useMemo(() =>
-    buildLeaderboard({ allTracked, gamesById, usersById }),
-    [allTracked, gamesById, usersById]
+  const memberPicks = useMemo(
+    () => allTracked.filter(tg => memberEmails.has(tg.user_email || tg.created_by)),
+    [allTracked, memberEmails]
   );
 
-  const filteredLeaderboard = useMemo(() => {
-    if (!leaderboardSearch.trim()) return leaderboard;
-    return leaderboard.filter(e => e.name.toLowerCase().includes(leaderboardSearch.toLowerCase()));
-  }, [leaderboard, leaderboardSearch]);
+  const leaderboard = useMemo(() =>
+    buildLeaderboard({
+      allTracked: memberPicks,
+      gamesById,
+      usersById,
+      filterGames: g => g.tournament_round != null,
+    }),
+    [memberPicks, gamesById, usersById]
+  );
 
-  // Picks with game detail per user (for dropdown)
+  // Picks with game detail per user (tournament only, for the dropdown)
   const picksByEmail = useMemo(() => {
     const map = {};
-    allTracked.forEach(tg => {
+    memberPicks.forEach(tg => {
       const email = tg.user_email || tg.created_by;
-      if (!email) return;
-      const game = gamesById[tg.game_id];
-      if (!game) return;
+      const g = gamesById[tg.game_id];
+      if (!g || !g.tournament_round) return;
       if (!map[email]) map[email] = [];
-      map[email].push({ ...tg, game });
+      map[email].push({ ...tg, game: g });
     });
     Object.keys(map).forEach(email => {
       map[email].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
     });
     return map;
-  }, [allTracked, gamesById]);
+  }, [memberPicks, gamesById]);
+
+  // Tournament picks for analytics
+  const tournamentPicks = useMemo(
+    () => memberPicks.filter(tg => gamesById[tg.game_id]?.tournament_round),
+    [memberPicks, gamesById]
+  );
+
+  const inviteUrl = pool ? `${window.location.origin}/Pools/join?code=${pool.invite_code}` : '';
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!pool) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
+        <p className="text-muted-foreground">Pool not found.</p>
+        <Link to="/Pools">
+          <Button variant="outline"><ArrowLeft className="w-4 h-4 mr-2" />Back to Pools</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  if (currentUser && !isMember) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4 p-4">
+        <Trophy className="w-12 h-12 text-muted-foreground" />
+        <p className="text-lg font-semibold">You're not a member of this pool</p>
+        <p className="text-muted-foreground text-sm text-center">Ask the pool creator for an invite link to join.</p>
+        <Link to="/Pools">
+          <Button variant="outline"><ArrowLeft className="w-4 h-4 mr-2" />My Pools</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link to={createPageUrl('Home')}>
+          <Link to="/Pools">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-primary" />
-            <h1 className="font-bold text-lg">CFB Alpha Pool</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-bold text-lg truncate">{pool.name}</h1>
+            <p className="text-xs text-muted-foreground">
+              {memberRows.length} member{memberRows.length !== 1 ? 's' : ''} · March Madness {pool.season}
+            </p>
           </div>
         </div>
       </header>
@@ -218,40 +262,28 @@ export default function Community() {
               <Trophy className="w-3 h-3" />
               Leaderboard
             </TabsTrigger>
-            <TabsTrigger value="chat" className="gap-1.5 text-xs px-3 py-1">
-              <MessageSquare className="w-3 h-3" />
-              Group Chat
-            </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-1.5 text-xs px-3 py-1">
               <BarChart2 className="w-3 h-3" />
               Analytics
             </TabsTrigger>
+            <TabsTrigger value="invite" className="gap-1.5 text-xs px-3 py-1">
+              <Share2 className="w-3 h-3" />
+              Invite
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="leaderboard">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            {leaderboard.length === 0 ? (
+              <div className="text-center py-20 text-muted-foreground text-sm">
+                No tournament picks yet from pool members.
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search by name..."
-                    value={leaderboardSearch}
-                    onChange={e => setLeaderboardSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-border bg-card focus:outline-none focus:ring-1 focus:ring-ring"
-                  />
-                </div>
-                {filteredLeaderboard.length === 0 ? (
-                  <div className="text-center py-20 text-muted-foreground">No picks yet across the group.</div>
-                ) : filteredLeaderboard.map((entry, i) => (
+                {leaderboard.map((entry, i) => (
                   <LeaderboardCard
                     key={entry.email}
                     entry={entry}
-                    rank={leaderboard.indexOf(entry)}
+                    rank={i}
                     picks={picksByEmail[entry.email] || []}
                   />
                 ))}
@@ -259,18 +291,32 @@ export default function Community() {
             )}
           </TabsContent>
 
-          <TabsContent value="chat">
-            <GroupChat currentUser={currentUser} />
+          <TabsContent value="analytics">
+            <TeamAnalytics allTracked={tournamentPicks} games={games} />
           </TabsContent>
 
-          <TabsContent value="analytics">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <TeamAnalytics allTracked={allTracked} games={games} />
-            )}
+          <TabsContent value="invite">
+            <Card>
+              <CardContent className="p-6 space-y-5">
+                <div>
+                  <p className="text-sm font-semibold mb-1 text-muted-foreground">Pool Invite Code</p>
+                  <p className="text-3xl font-black tracking-widest text-primary">{pool.invite_code}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold mb-2 text-muted-foreground">Shareable Link</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-xs bg-muted px-3 py-2 rounded-lg break-all">{inviteUrl}</code>
+                    <Button size="sm" variant="outline" onClick={handleCopy} className="flex-shrink-0 gap-1.5">
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copied ? 'Copied!' : 'Copy'}
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Share this link with friends — they'll be added to your pool automatically.
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
