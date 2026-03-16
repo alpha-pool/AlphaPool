@@ -38,7 +38,7 @@ Game data and spreads are synced via two Supabase Edge Functions in `supabase/fu
 
 | Function | Source | Purpose |
 |---|---|---|
-| `syncGames` | ESPN API | Upserts today's NCAAB games into the `games` table |
+| `syncGames` | ESPN API | Upserts today's NCAAB games; auto-deletes stale final regular-season games |
 | `syncSpreads` | The Odds API | Updates `spread` and `spread_team` on non-final games |
 
 ### Deploying functions
@@ -64,12 +64,30 @@ curl -X POST https://<project-ref>.supabase.co/functions/v1/syncGames
 curl -X POST https://<project-ref>.supabase.co/functions/v1/syncSpreads
 ```
 
-### Recommended cron schedule
+### Cron schedule (pg_cron)
 
-| Function | Schedule |
-|---|---|
-| `syncGames` | Every 1-5 minutes during game windows |
-| `syncSpreads` | Once weekly (Tuesday morning) |
+Cron jobs are configured via pg_cron in the Supabase SQL editor. Both `pg_cron` and `pg_net` extensions must be enabled (**Database → Extensions**).
+
+| Job name | Schedule | Purpose |
+|---|---|---|
+| `sync-games-daily` | `0 10 * * *` (10am UTC / 6am ET) | Seeds next day's tournament games |
+| `sync-games-live` | `*/5 17-23,0-4 * * *` | Live score updates during game windows |
+| `syncSpreads` | Once weekly (Tuesday morning) | Refresh pre-game spreads |
+
+To view or manage jobs:
+```sql
+-- List all jobs
+select jobname, schedule, active from cron.job;
+
+-- View recent run history
+select jobname, status, return_message, start_time
+from cron.job_run_details
+order by start_time desc limit 20;
+
+-- Pause / resume
+select cron.alter_job('sync-games-live', active := false);
+select cron.alter_job('sync-games-live', active := true);
+```
 
 ## Supabase Table Permissions
 
@@ -79,5 +97,20 @@ The following tables need a public `SELECT` policy for the frontend to read data
 - `tracked_games`
 - `users`
 - `group_messages`
+- `pools`
+- `pool_members`
 
 Go to **Supabase → Authentication → Policies → [table] → New Policy** and add a `SELECT` policy with `true` as the expression.
+
+`pools` and `pool_members` also need an authenticated `INSERT` policy (`auth.role() = 'authenticated'`).
+
+### Foreign key constraint
+
+`tracked_games.game_id` must have `ON DELETE CASCADE` so that deleting a game automatically removes associated picks:
+
+```sql
+ALTER TABLE tracked_games
+  DROP CONSTRAINT IF EXISTS tracked_games_game_id_fkey,
+  ADD CONSTRAINT tracked_games_game_id_fkey
+    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE;
+```

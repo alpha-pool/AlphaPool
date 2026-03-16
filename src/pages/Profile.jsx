@@ -106,7 +106,7 @@ export default function Profile() {
 
   const myPicks = useMemo(() => {
     return allTracked
-      .filter(tg => tg.created_by === targetEmail)
+      .filter(tg => (tg.user_email || tg.created_by) === targetEmail)
       .map(tg => ({ ...tg, game: gamesById[tg.game_id] }))
       .filter(tg => tg.game)
       .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));

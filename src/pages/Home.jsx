@@ -74,15 +74,20 @@ export default function Home() {
   
   const trackedGameIds = trackedGames.map(tg => tg.game_id);
   
+  const tournamentGames = useMemo(() =>
+    games.filter(g => g.tournament_round != null),
+    [games]
+  );
+
   const conferences = useMemo(() => {
     const seen = new Set();
-    games.forEach(g => { if (g.conference) seen.add(g.conference); });
+    tournamentGames.forEach(g => { if (g.conference) seen.add(g.conference); });
     return Array.from(seen).sort();
-  }, [games]);
+  }, [tournamentGames]);
 
-  const isTournament = games.some(g => g.tournament_round);
+  const isTournament = tournamentGames.length > 0;
 
-  const filteredGames = games.filter(game => {
+  const filteredGames = tournamentGames.filter(game => {
     const matchesSearch =
       game.home_team?.toLowerCase().includes(search.toLowerCase()) ||
       game.away_team?.toLowerCase().includes(search.toLowerCase());
@@ -98,7 +103,7 @@ export default function Home() {
   const trackedGamesWithDetails = trackedGames.map(tg => ({
     ...tg,
     game: games.find(g => g.id === tg.game_id),
-  })).filter(tg => tg.game);
+  })).filter(tg => tg.game && tg.game.tournament_round != null);
   
   const liveTracked = trackedGamesWithDetails.filter(tg => tg.game.status === 'live');
   const upcomingTracked = trackedGamesWithDetails.filter(tg => tg.game.status === 'scheduled');

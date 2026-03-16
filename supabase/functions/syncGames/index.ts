@@ -122,10 +122,41 @@ Deno.serve(async () => {
       }
     }
 
+    // Remove stale regular-season games: final, not a tournament game, and
+    // not seen in today's ESPN response. Guard against empty events (API outage).
+    let deletedStale = 0;
+    if (events.length > 0) {
+      const todayExternalIds = events.map((e: any) => e.id);
+
+      const { data: staleGames, error: fetchError } = await supabase
+        .from('games')
+        .select('id')
+        .eq('status', 'final')
+        .is('tournament_round', null)
+        .not('external_id', 'in', `(${todayExternalIds.join(',')})`);
+
+      if (fetchError) {
+        console.error('Stale game fetch error:', fetchError.message);
+      } else if (staleGames && staleGames.length > 0) {
+        const staleIds = staleGames.map((g: any) => g.id);
+        // tracked_games.game_id has ON DELETE CASCADE — deleting games cleans up picks
+        const { error: deleteError } = await supabase
+          .from('games')
+          .delete()
+          .in('id', staleIds);
+        if (deleteError) {
+          console.error('Stale game delete error:', deleteError.message);
+        } else {
+          deletedStale = staleIds.length;
+        }
+      }
+    }
+
     return Response.json({
       message: 'Sync complete',
       ...results,
       total: events.length,
+      deletedStale,
     });
   } catch (error) {
     return Response.json({ error: (error as Error).message }, { status: 500 });

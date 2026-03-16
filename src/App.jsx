@@ -11,6 +11,7 @@ import AcceptInvite from './pages/AcceptInvite';
 import Pools from './pages/Pools';
 import PoolDetail from './pages/PoolDetail';
 import PoolJoin from './pages/PoolJoin';
+import Admin from './pages/Admin';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -66,6 +67,7 @@ const AuthenticatedApp = () => {
       <Route path="/Pools" element={<Pools />} />
       <Route path="/Pools/join" element={<PoolJoin />} />
       <Route path="/Pools/:poolId" element={<PoolDetail />} />
+      <Route path="/Admin" element={<Admin />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
